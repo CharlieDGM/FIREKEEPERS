@@ -1,3 +1,4 @@
+#gotta be honest, hice esto por enero y no recuerdo su funcionamiento exacto
 import mysql.connector 
 
 def verTabla(host_, user_, password_, database_, tabla_):
