@@ -40,16 +40,13 @@ String rpiReading() {
   }
 }
 
- void rpiWrite(String message) {
-   rpi.println(message);
- } //ni se para que hice esta función, nomas para "facilitar una linea de texto" bruuuuhhh. Creo que la voy a borrar en commits futuros
-
-
 class motor { //una clase que contiene funciones para encender y apagar las bombas de agua. Necesitamos controlar un relay y mandar una señal a los controladores
   void On(int motor) {
     int pulseToSend = 20;
 
     digitalWrite(relayPins[motor], HIGH);
+    escControl[motor].write(0);
+    delay(2000);
     escControl[motor].write(pulseToSend); //encendemos el relay junto con el controlador del motor
   }
 
@@ -66,7 +63,7 @@ void setup() {
 
   for (int n = 0; n < 4, n++;) { //aprovechando que de todo tenemos 4 metemos todo en un ciclo for para iniciar sus protocolos correspondientes
     char escControlPins[4] = {A4, A5, A6, A7};
-    escControl[n].attach(escControlPins[n]);
+    escControl[n].attach(escControlPins[n], 1000, 2000);
     escControl[n].write(0);
 
     pinMode(sensorPins[n], INPUT);
