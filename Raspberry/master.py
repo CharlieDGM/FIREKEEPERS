@@ -14,6 +14,39 @@ from datetime import datetime
 import serial
 #comunicación serial
 
+class dataBase:
+    def addData(state, ubication):
+        actualDate = datetime.now()
+
+        temporalMark = actualDate.strftime('%d-%m-%Y %H:%M:%S')
+
+        conn = mysql.connector.connect(
+            host="localhost", 
+            user="piPython", 
+            password="pythonistrash", 
+            database="prueba01",
+        )
+
+        cur = conn.cursor()
+        cur.execute("INSERT INTO ////// (ubication, state, time) values (%s, %s, %s);", (ubication, state,temporalMark))
+        conn.commit()
+        conn.close()
+        print(f"Se han ingresado con exito los datos", str(ubication), "y ", str(state))
+
+    def deleteAllData():
+        conn = mysql.connector.connect(
+            host="localhost", 
+            user="piPython", 
+            password="pythonistrash", 
+            database="prueba01",
+        )
+
+        cur = conn.cursor()
+        cur.execute("DELETE * FROM //////;")
+        conn.commit()
+        conn.close()
+        print("Se han eliminado todos los datos de la tabla.")
+
 class camaras:
     def camara1Lecture():
         _, frame = cam1.read()
