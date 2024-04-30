@@ -2,7 +2,7 @@ import mysql.connector
 import RPi.GPIO as GPIO
 from datetime import datetime
 
-def AñadirDatos(nombre, edad):
+def AñadirDatos(ubication)
     fechaActual = datetime.now()
     
     marcaTemporal = fechaActual.strftime('%d-%m-%Y %H:%M:%S')
@@ -14,13 +14,12 @@ def AñadirDatos(nombre, edad):
         database="prueba01",
     )
     cur = conn.cursor()
-    cur.execute("INSERT INTO pruebaTabla (especie, edad, hora) values (%s, %s, %s);", (nombre, edad,marcaTemporal))
+    cur.execute("INSERT INTO incendios (ubicacion, hora) values (%s, %s);", (ubication,marcaTemporal))
     conn.commit()
     conn.close()
     print("Dato ingresado!")
     return 0
 
-nombreIngresada = input("Ingresa el nombre de tu animal: ")
-edadIngresada = int(input("Ingresa la edad de tu animal: "))
+ubication = input("Ingresa el nombre de tu animal: ")
 
-AñadirDatos(nombreIngresada, edadIngresada)
+AñadirDatos(ubication)
