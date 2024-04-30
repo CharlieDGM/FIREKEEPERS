@@ -15,7 +15,7 @@ import serial
 #comunicación serial
 
 class dataBase:
-    def addData(state, ubication):
+    def addData(ubication):
         actualDate = datetime.now()
 
         temporalMark = actualDate.strftime('%d-%m-%Y %H:%M:%S')
@@ -28,10 +28,10 @@ class dataBase:
         )
 
         cur = conn.cursor()
-        cur.execute("INSERT INTO ////// (ubication, state, time) values (%s, %s, %s);", (ubication, state,temporalMark))
+        cur.execute("INSERT INTO incendios (ubicacion, hora) values (%s, %s);", (ubication, temporalMark))
         conn.commit()
         conn.close()
-        print(f"Se han ingresado con exito los datos", str(ubication), "y ", str(state))
+        print(f"Se han ingresado con exito los datos", str(ubication), "y la hora: ", str(temporalMark))
 
     def deleteAllData():
         conn = mysql.connector.connect(
@@ -42,7 +42,7 @@ class dataBase:
         )
 
         cur = conn.cursor()
-        cur.execute("DELETE * FROM //////;")
+        cur.execute("DELETE FROM incendios;")
         conn.commit()
         conn.close()
         print("Se han eliminado todos los datos de la tabla.")
