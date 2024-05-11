@@ -14,6 +14,9 @@ char sensorPins[4] = {A0, A1, A2, A3};
 int relayPins[4] = {2, 3, 4, 5};
 Servo escControl[4]; //A4, A5, A6 y A7 (se les coloca en esos pines en el setup)
 
+bool FireState = false; //bandera que nos indicara si se ha detectado fuego lol xdxxdxdxd
+int resetBoton = 6; //boton de reseteo, i guess lol
+
 bool AnalogLecture(char InPin, int limit) {
   int aux = analogRead(InPin); //lee la entrada del pin analógico que le indiquemos
   if (aux > limit) {
@@ -41,6 +44,7 @@ String rpiReading() {
 }
 
 class motor { //una clase que contiene funciones para encender y apagar las bombas de agua. Necesitamos controlar un relay y mandar una señal a los controladores
+  public:
   void On(int motor) {
     int pulseToSend = 20;
 
@@ -59,10 +63,12 @@ class motor { //una clase que contiene funciones para encender y apagar las bomb
 void setup() {
   Serial.begin(9600);
   rpi.begin(9600);
+
+  pinMode(resetBoton, INPUT_PULLUP);
+  char escControlPins[4] = {A4, A5, A6, A7};
 //iniciamos la comunicación serial de estas cosas todas horribles
 
-  for (int n = 0; n < 4, n++;) { //aprovechando que de todo tenemos 4 metemos todo en un ciclo for para iniciar sus protocolos correspondientes
-    char escControlPins[4] = {A4, A5, A6, A7};
+  for (int n = 0; n < 4; n++) { //aprovechando que de todo tenemos 4 metemos todo en un ciclo for para iniciar sus protocolos correspondientes  
     escControl[n].attach(escControlPins[n], 1000, 2000);
     escControl[n].write(0);
 
@@ -71,5 +77,25 @@ void setup() {
     //lo mismo, iniciamos los pines de los sensores y los relays
   }
 }
+
+void loop() {
+  int butonState = digitalRead(resetBoton);
+
+  if (FireState==false) {
+    if (rpiReading().equals("norte") || AnalogLecture(sensorPins[0], 800)) {
+      FireState = true;
+      motor().On(0);
+    }
+
+  } else {
+    if (butonState==LOW) {
+      FireState = false;
+    }
+
+    motor().On(0);
+    rpi.println("norte");
+
+  }
+} 
 
 //-DemoKnight TF2
