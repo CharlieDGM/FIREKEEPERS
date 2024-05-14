@@ -46,11 +46,9 @@ String rpiReading() {
 class motor { //una clase que contiene funciones para encender y apagar las bombas de agua. Necesitamos controlar un relay y mandar una señal a los controladores
   public:
   void On(int motor) {
-    int pulseToSend = 20;
+    int pulseToSend = 10;
 
     digitalWrite(relayPins[motor], HIGH);
-    escControl[motor].write(0);
-    delay(2000);
     escControl[motor].write(pulseToSend); //encendemos el relay junto con el controlador del motor
   }
 
@@ -63,10 +61,11 @@ class motor { //una clase que contiene funciones para encender y apagar las bomb
 void setup() {
   Serial.begin(9600);
   rpi.begin(9600);
+//iniciamos la comunicación serial de estas cosas todas horribles
 
   pinMode(resetBoton, INPUT_PULLUP);
+
   char escControlPins[4] = {A4, A5, A6, A7};
-//iniciamos la comunicación serial de estas cosas todas horribles
 
   for (int n = 0; n < 4; n++) { //aprovechando que de todo tenemos 4 metemos todo en un ciclo for para iniciar sus protocolos correspondientes  
     escControl[n].attach(escControlPins[n], 1000, 2000);
@@ -80,17 +79,32 @@ void setup() {
 
 void loop() {
   int butonState = digitalRead(resetBoton);
+  if (butonState==LOW) {
+      FireState = false;
+      motor().Off(0);
+      rpi.println("reset");
+      Serial.println("Sistema Reseteado");
+    }
 
   if (FireState==false) {
-    if (rpiReading().equals("norte") || AnalogLecture(sensorPins[0], 800)) {
+    motor().Off(0);
+
+    if (rpiReading().equals("norte") || AnalogLecture(sensorPins[0], 65)) {
+      FireState = true;
+      motor().On(0);
+    }
+    
+    if (rpiReading().equals("rte") || rpiReading().equals("orte")) {
+      FireState = true;
+      motor().On(0);
+    }
+
+    if (rpiReading().equals("te") || rpiReading().equals("e")) {
       FireState = true;
       motor().On(0);
     }
 
   } else {
-    if (butonState==LOW) {
-      FireState = false;
-    }
 
     motor().On(0);
     rpi.println("norte");
