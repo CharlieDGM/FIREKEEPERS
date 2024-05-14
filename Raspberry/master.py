@@ -13,6 +13,10 @@ from datetime import datetime
 
 import serial
 #comunicación serial
+import time
+
+fireDetected = False
+#bandera que controla acciones dependiendo si hay fuego detectado
 
 class dataBase:
     def addData(ubication):
@@ -54,8 +58,8 @@ class camaras:
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         #convertimos los colores a HSV (Hue, Saturation, Value) para su manipulacion
 
-        lower_color = np.array([40, 50, 50])
-        upper_color = np.array([80, 255, 255])
+        lower_color = np.array([20, 40, 100])
+        upper_color = np.array([80, 255, 150])
         #arrays de colores en hsv, nuestro margen de detección (margen de que punto a que punto vamos a detectar)
 
         mask = cv2.inRange(hsv, lower_color, upper_color)
@@ -70,7 +74,10 @@ class camaras:
 
         #cv2.imshow('Original', frame)
         cv2.imshow('Mask', mask)
-        return percentage
+        if percentage >= 15:
+            return True
+        else:
+            return False
     
     def camara2Lecture():
         _, frame = cam2.read()
@@ -88,7 +95,10 @@ class camaras:
         percentage = (num_pixels * 100) / total_pixels
 
         cv2.imshow('Mask', mask)
-        return percentage
+        if percentage >= 20:
+            return True
+        else:
+            return False
     
     def camara3Lecture():
         _, frame = cam3.read()
@@ -106,7 +116,10 @@ class camaras:
         percentage = (num_pixels * 100) / total_pixels
 
         cv2.imshow('Mask', mask)
-        return percentage
+        if percentage >= 20:
+            return True
+        else:
+            return False
     
     def camara4Lecture():
         _, frame = cam4.read()
@@ -124,26 +137,36 @@ class camaras:
         percentage = (num_pixels * 100) / total_pixels
 
         cv2.imshow('Mask', mask)
-        return percentage
+        if percentage >= 20:
+            return True
+        else:
+            return False
 
-class serialCom:
-    def serialLecture():
-        if serial.in_waiting > 0:
-                #serial.reset_input_buffer()
-                #supuestamente es para limpiar el input pero esta linea genera mas problemas
-                mensaje = serial.readline().decode('utf-8').rstrip()
-                #por partes: se lee la linea recibida, se decodifica y se limpian los espacios en blanco
-                print(mensaje)
-                return mensaje
+def serialLecture():
+    if serial.in_waiting > 0:
+        #serial.reset_input_buffer()
+        #supuestamente es para limpiar el input pero esta linea genera mas problemas
+        mensaje = serial.readline().decode('utf-8').rstrip()
+        #por partes: se lee la linea recibida, se decodifica y se limpian los espacios en blanco
+        print(mensaje)
+        return mensaje
             
-    def serialSend(mensajeToSend):
-        if type(mensajeToSend) != str:
-            str(mensajeToSend)
-        mensaje = f"{mensajeToSend}\n"
-        serial.write(mensaje.encode('utf-8'))
-        print(f"Enviado: {mensajeToSend}")
+def serialSend(mensajeToSend):
+    if type(mensajeToSend) != str:
+        str(mensajeToSend)
+    mensaje = f"{mensajeToSend}\n"
+    serial.write(mensaje.encode('utf-8'))
+    time.sleep(0.003)
+    serial.write(mensaje.encode('utf-8'))
+    time.sleep(0.003)
+    serial.write(mensaje.encode('utf-8'))
+    time.sleep(0.003)
+    serial.write(mensaje.encode('utf-8'))
+    print(f"Enviado: {mensajeToSend}")
         
 if __name__ == '__main__':
+    alreadyActivated = False
+    
     cam1 = cv2.VideoCapture(0)
     #cam2 = cv2.VideoCapture(2)
     #cam3 = cv2.VideoCapture(4)
@@ -158,8 +181,18 @@ if __name__ == '__main__':
     #se limpia todo mensaje que exista en ese momento
     try:
         while True:
-            camaras.camara1Lecture()
-            serialCom.serialLecture()
+            if fireDetected == False:
+                if serialLecture() == "norte" or camaras.camara1Lecture() == True:
+                    fireDetected = True
+            else:
+                if alreadyActivated == False:
+                    serialSend("norte")
+                    dataBase.addData("norte")
+                    alreadyActivated = True
+                if serialLecture() == "reset":
+                        fireDetected = False
+                        alreadyActivated = False
+                        dataBase.deleteAllData
             
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
