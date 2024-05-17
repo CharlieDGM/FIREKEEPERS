@@ -12,11 +12,18 @@ from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 from kivy.clock import Clock
+
 import mysql.connector
+from plyer import notification
 
 #clase principal que almacena todos los contenidos de la interfaz gráfica
 class AplicacionMYSQLDB(App):
+    def __init__(self, **kwargs):
+        super(AplicacionMYSQLDB, self).__init__(**kwargs)
+        self.ultima_marca_tiempo = None
+
     def build(self):
+
         #layout principal de la applicación, donde todos los objetos seran puestos
         main_layout = BoxLayout(orientation='vertical', spacing=0)
 
@@ -79,6 +86,12 @@ class AplicacionMYSQLDB(App):
             cursor.execute(f"SELECT * FROM {tabla_}") #Query que los datos de la tabla
             rows = cursor.fetchall() #guardamos los datos en "rows"
 
+            if self.haCambiadoDatos(rows):
+                notification.notify(
+                    title='Se ha registrado un incendio!',
+                    message='Sigue las instrucciones de las autoridades de tu area',
+                )
+
             for row in rows: #ahora ejecutamos un ciclo que imprimira todos los datos que se encuentren en la tabla
                 self.cuadroTexto.text += str(row) + "\n"
 
@@ -115,6 +128,27 @@ class AplicacionMYSQLDB(App):
 
         #Intervalo entre llamada a la función    
         Clock.schedule_interval(actualizarDatos, 7)
+
+    def haCambiadoDatos(self, rows):
+        if not rows:
+            return False #NO hay datos tons es falso
+        
+        ultima_marca_tiempo_tabla = rows[-1][-1] #la marca temporal se encuentra al final
+
+        if self.ultima_marca_tiempo is None:
+            #es la primera vez que se verifica, actualizamos el valor de la marca temporal
+            self.ultima_marca_tiempo = ultima_marca_tiempo_tabla 
+            return False # No hay cambios por ser la primera verificación (creo xd?)
+        
+
+        if ultima_marca_tiempo_tabla > self.ultima_marca_tiempo:
+            #si son datos diferentes entonces si hay cambio 
+            self.ultima_marca_tiempo = ultima_marca_tiempo_tabla
+            return True #devolvemos verdadero
+        
+        return False
+            
+        
 
 #el equivalente al while True en esta interfaz gráfica, iniciamos el loop que contiene toda la aplicación
 if __name__ == '__main__':
