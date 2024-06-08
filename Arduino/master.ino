@@ -9,7 +9,7 @@
 //librerias iniciales
 
 SoftwareSerial rpi(11, 12); //donde va a ir conectado el raspberry
-char sensorPins[4] = {A0, A1, A2, A3};
+int sensorPins[4] = {A0, A1, A2, A3};
 //arrays que contienen a donde van conectados los componentes
 int relayPins[4] = {2, 3, 4, 5};
 Servo escControl[4]; //A4, A5, A6 y A7 (se les coloca en esos pines en el setup)
@@ -31,14 +31,10 @@ bool AnalogLecture(char InPin, int limit) {
 String rpiReading() {
   String lecture;
 
-  if (rpi.available()) {  //comprueba si hay datos seriales disponibles
-    while (rpi.available() > 0) {//mientras estan disponibles los lee
-      rpi.read();
-    }
-
+  if (rpi.available()) {  //comprueba si hay datos seriales disponibles4
     lecture = rpi.readStringUntil('\n');
     lecture.trim(); //ajustamos la lectura por cualquier error que pueda ocurrir
-    Serial.println(lecture);
+    Serial.println("Lectura de la raspberry lol xd: " + lecture);
     return lecture; //imprimimos y guardamos el valor de la lectura obtenida
   }
 }
@@ -46,7 +42,7 @@ String rpiReading() {
 class motor { //una clase que contiene funciones para encender y apagar las bombas de agua. Necesitamos controlar un relay y mandar una señal a los controladores
   public:
   void On(int motor) {
-    int pulseToSend = 10;
+    int pulseToSend = 20;
 
     digitalWrite(relayPins[motor], HIGH);
     escControl[motor].write(pulseToSend); //encendemos el relay junto con el controlador del motor
@@ -89,7 +85,7 @@ void loop() {
   if (FireState==false) {
     motor().Off(0);
 
-    if (rpiReading().equals("norte") || AnalogLecture(sensorPins[0], 65)) {
+    if (rpiReading().equals("norte") || AnalogLecture(sensorPins[0], 80)) {
       FireState = true;
       motor().On(0);
     }
