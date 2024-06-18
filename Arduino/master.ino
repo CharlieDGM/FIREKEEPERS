@@ -4,11 +4,12 @@
 //de los motores. Mandara mensajes a la Raspberry para poder operar en conjunto y realizar tareas
 //especificas
 
-#include <SoftwareSerial.h>
-#include <Servo.h>
+#include <HardwareSerial.h>
+ //no tengo idea si esto es necesario para imprimir mensajes en la consola, lo voy a dejar por si las moscas xd
+#include <ESP32Servo.h>
 //librerias iniciales
 
-SoftwareSerial rpi(11, 12); //donde va a ir conectado el raspberry
+HardwareSerial rpi(1); // PUERTO UART 2 / objeto que se usara para la comunicacion serial RPI - ESP32
 int sensorPins[4] = {A0, A1, A2, A3};
 //arrays que contienen a donde van conectados los componentes
 int relayPins[4] = {2, 3, 4, 5};
@@ -39,25 +40,35 @@ String rpiReading() {
   }
 }
 
-class motor { //una clase que contiene funciones para encender y apagar las bombas de agua. Necesitamos controlar un relay y mandar una señal a los controladores
-  public:
-  void On(int motor) {
-    int pulseToSend = 20;
+class Motor { //una clase que contiene funciones para encender y apagar las bombas de agua. Necesitamos controlar un relay y mandar una señal a los controladores
+  private:
+    int motorNumber;
 
-    digitalWrite(relayPins[motor], HIGH);
-    escControl[motor].write(pulseToSend); //encendemos el relay junto con el controlador del motor
+  public:
+  Motor(int m) {
+    motorNumber = m;
   }
 
-  void Off(int motor) {
-    digitalWrite(relayPins[motor], LOW);
-    escControl[motor].write(0); //apagamos el relay junto con el controlador del motor
+  void On(int pulseToSend) {
+    digitalWrite(relayPins[motorNumber], HIGH);
+    escControl[motorNumber].write(pulseToSend); //encendemos el relay junto con el controlador del motor
+  }
+
+  void Off() {
+    digitalWrite(relayPins[motorNumber], LOW);
+    escControl[motorNumber].write(0); //apagamos el relay junto con el controlador del motor
   }
 };
 
 void setup() {
+  Motor motor1(0); //creamos los 4 objetos de los motores, mandandole a cada una una variable de 0 - 3 (es mas facil esto porque ya estan declarados
+  Motor motor2(1); //los pines de los objetos, entonces al llamar a la funcion de cada objeto se van a activar con la asignacion realizada (ni yo me entendi lol)
+  Motor motor3(2);
+  Motor motor4(3);
+
   Serial.begin(9600);
-  rpi.begin(9600);
-//iniciamos la comunicación serial de estas cosas todas horribles
+  rpi.begin(9600, SERIAL_8N1, 16, 17); 
+//iniciamos la comunicación serial de estas cosas todas horribles (conectado al 2do puerto: 16 rx, 17 tx)
 
   pinMode(resetBoton, INPUT_PULLUP);
 
@@ -77,32 +88,13 @@ void loop() {
   int butonState = digitalRead(resetBoton);
   if (butonState==LOW) {
       FireState = false;
-      motor().Off(0);
       rpi.println("reset");
       Serial.println("Sistema Reseteado");
     }
 
   if (FireState==false) {
-    motor().Off(0);
-
-    if (rpiReading().equals("norte") || AnalogLecture(sensorPins[0], 80)) {
-      FireState = true;
-      motor().On(0);
-    }
     
-    if (rpiReading().equals("rte") || rpiReading().equals("orte")) {
-      FireState = true;
-      motor().On(0);
-    }
-
-    if (rpiReading().equals("te") || rpiReading().equals("e")) {
-      FireState = true;
-      motor().On(0);
-    }
-
   } else {
-
-    motor().On(0);
     rpi.println("norte");
 
   }
