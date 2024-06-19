@@ -4,8 +4,11 @@ HOLa, somos el equipo Oppenh3imers Vol. 2.0 de Guatemala y somos participantes d
 
 -[Programación Raspberry](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/Raspberry) La rasbperry servira como base central de operaciones.
 
--[Programación Arduino](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/Arduino) El arduino seran los "musculos" del proyecto, realizando multiples lecturas y escrituras digitales/analógicas y también mandando señales PWM a los drivers de los motores.
+-[Programación ESP32](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/ESP32) El ESP32 seran los "musculos" del proyecto, realizando multiples lecturas y escrituras digitales/analógicas y también mandando señales PWM a los drivers de los motores.
 
 -[Programación SQLapp](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/AppAndroid/appMaster) Y la aplicación sera un complemento del proyecto
+
+Extras:
+-[Pruebas arduino](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/Arduino) Pruebas que se hicieron antes de la culminación del proyecto.
 
 -DemoKnight TF2
