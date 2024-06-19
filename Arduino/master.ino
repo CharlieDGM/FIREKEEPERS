@@ -1,44 +1,44 @@
-  //alright, empecemos a trabajar el codigo master del proyecto
-  //El arduino va a servir como los "musculos" del proyecto, va a realizar lecturas analógicas de los sensores,
-  //va a ancender las baterias(o fuentes) de los motores y va a mandar señales PWM a los controladores
-  //de los motores. Mandara mensajes a la Raspberry para poder operar en conjunto y realizar tareas
-  //especificas
+//alright, empecemos a trabajar el codigo master del proyecto
+//El arduino va a servir como los "musculos" del proyecto, va a realizar lecturas analógicas de los sensores,
+//va a ancender las baterias(o fuentes) de los motores y va a mandar señales PWM a los controladores
+//de los motores. Mandara mensajes a la Raspberry para poder operar en conjunto y realizar tareas
+//especificas
 
-  #include <HardwareSerial.h>
-  //no tengo idea si esto es necesario para imprimir mensajes en la consola, lo voy a dejar por si las moscas xd
-  #include <ESP32Servo.h>
-  //librerias iniciales
+#include <HardwareSerial.h>
+//no tengo idea si esto es necesario para imprimir mensajes en la consola, lo voy a dejar por si las moscas xd
+#include <ESP32Servo.h>
+//librerias iniciales
 
-  HardwareSerial rpi(1); // PUERTO UART 2 / objeto que se usara para la comunicacion serial RPI - ESP32
-  int sensorPins[3] = {32, 26, 13};
-  //arrays que contienen a donde van conectados los componentes
-  int relayPins[4] = {2, 3, 4, 5};
-  Servo escControl[4]; //23, 3, 18, 15 (se les coloca en esos pines en el setup)
+HardwareSerial rpi(1); // PUERTO UART 2 / objeto que se usara para la comunicacion serial RPI - ESP32
+int sensorPins[3] = {32, 26, 13};
+//arrays que contienen a donde van conectados los componentes
+int relayPins[4] = {2, 3, 4, 5};
+Servo escControl[4]; //23, 3, 18, 15 (se les coloca en esos pines en el setup)
 
-  bool FireState = false; //ELIMINAR TODA INSTANCIA DE ESTA BANDERA EN FUTURAS VERSIONES
-  int resetBoton = 6; //boton de reseteo, i guess lol
+bool FireState = false; //ELIMINAR TODA INSTANCIA DE ESTA BANDERA EN FUTURAS VERSIONES
+int resetBoton = 6; //boton de reseteo, i guess lol
 
-  bool AnalogLecture(char InPin, int limit) {
-    int aux = analogRead(InPin); //lee la entrada del pin analógico que le indiquemos
-    if (aux > limit) {
-      Serial.println("Pin Leido: " + String(InPin) + ". Lectura Obtenida: " + String(aux));
-      return true; 
-    } else {
-      Serial.println("Pin Leido: " + String(InPin) + ". Lectura Obtenida: " + String(aux));
-      return false;
-    } //devuelve true o false dependiendo de la lectura
+bool AnalogLecture(char InPin, int limit) {
+  int aux = analogRead(InPin); //lee la entrada del pin analógico que le indiquemos
+  if (aux > limit) {
+    Serial.println("Pin Leido: " + String(InPin) + ". Lectura Obtenida: " + String(aux));
+    return true; 
+  } else {
+    Serial.println("Pin Leido: " + String(InPin) + ". Lectura Obtenida: " + String(aux));
+    return false;
+  } //devuelve true o false dependiendo de la lectura
+}
+
+String rpiReading() {
+  String lecture;
+
+  if (rpi.available()) {  //comprueba si hay datos seriales disponibles4
+    lecture = rpi.readStringUntil('\n');
+    lecture.trim(); //ajustamos la lectura por cualquier error que pueda ocurrir
+    Serial.println("Lectura de la raspberry lol xd: " + lecture);
+    return lecture; //imprimimos y guardamos el valor de la lectura obtenida
   }
-
-  String rpiReading() {
-    String lecture;
-
-    if (rpi.available()) {  //comprueba si hay datos seriales disponibles4
-      lecture = rpi.readStringUntil('\n');
-      lecture.trim(); //ajustamos la lectura por cualquier error que pueda ocurrir
-      Serial.println("Lectura de la raspberry lol xd: " + lecture);
-      return lecture; //imprimimos y guardamos el valor de la lectura obtenida
-    }
-  }
+}
 
 class Motor { //una clase que contiene funciones para encender y apagar las bombas de agua. Necesitamos controlar un relay y mandar una señal a los controladores
   private:
