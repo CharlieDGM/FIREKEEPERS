@@ -16,7 +16,6 @@ int sensorPins[3] = {32, 26, 12};
 Servo escControl[4]; //23, 21, 18, 2 (se les coloca en esos pines en el setup)
 
 //bool FireState = false; //ELIMINAR TODA INSTANCIA DE ESTA BANDERA EN FUTURAS VERSIONES
-//int resetBoton = 6; //boton de reseteo, i guess lol ELIMINAR TODA INSTANCIA DE ESTE BOTON
 
 bool AnalogLecture(char InPin, int limit) {
   int aux = analogRead(InPin); //lee la entrada del pin analógico que le indiquemos
@@ -68,11 +67,12 @@ void setup() {
   rpi.begin(9600, SERIAL_8N1, 16, 17); 
   //iniciamos la comunicación serial de estas cosas todas horribles (conectado al 2do puerto: 16 rx, 17 tx)
 
-  //pinMode(resetBoton, INPUT_PULLUP);
-
   char escControlPins[4] = {23, 21, 18, 2}; //a la izquierda del controlador
   delay(2000);
   Serial.println("");
+  Serial.println("Encendiendo...");
+  delay(2000);
+  rpi.println("start");
   for (int n = 0; n < 4; n++) { //aprovechando que de todo tenemos 4 metemos todo en un ciclo for para iniciar sus protocolos correspondientes  
     Serial.println("Se ha iniciado el motor: " + String(n+1));
     escControl[n].attach(escControlPins[n], 1000, 2000);
@@ -86,30 +86,13 @@ void setup() {
   for (int n = 0; n < 3; n++) {
     pinMode(sensorPins[n], INPUT); //pero sensores solo son 3 >:/ (asi q hay que hacer otro ciclo for)
   }
+  Serial.println("Iniciando todo pipipip...");
   delay(3000);
 }
 
 void loop() {
-  //int butonState = digitalRead(resetBoton);
-  //if (butonState==LOW) { //Para el algoritmo: BOTON DE RESETEO, AGREGAR TODA FUNCION QUE SEA NECESARIA PARA DEJAR EN UN ESTADO NEUTRO EL PROYECTO
-    //FireState = false;
-    //for (int n = 0; n < 4; n++) {
-      //motors[n].Off();
-      //delay(1000);
-    //} 
-    //rpi.println("reset");
-    //Serial.println("Sistema Reseteado");
-  //}
-  
   motors[0].On(100);
-
-  //if (FireState==false) {
-  //test: solo vamos a confirmar que el motor se encienda correctamente
-  //Para el algoritmo: AQUI VAN LAS LECTURAS (Seriales y Analogicas) QUE VAN A CAMBIAR EL ESTADO DE LA BANDERA FireState A true
-  //} else {
-    //Para el algoritmo: AQUI VAN LAS FUNCIONES QUE SE VAN A EJECUTAR LUEGO DE PASAR EL ESTADO DE LA BANDERA A true (sin tomar en cuenta funcion para devolver su estado a false)
-
-  //}
+  //REESTRUCTURAR COMPLETAMENTE EL ALGORITMO
 } 
 
 //-DemoKnight TF2
