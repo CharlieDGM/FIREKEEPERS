@@ -9,14 +9,14 @@
 #include <ESP32Servo.h>
 //librerias iniciales
 
-HardwareSerial rpi(1); // PUERTO UART 2 / objeto que se usara para la comunicacion serial RPI - ESP32
-int sensorPins[3] = {32, 26, 13};
+HardwareSerial rpi(1); // PUERTO UART 2 / / conectado a pines 16 y 17 en el setup / objeto que se usara para la comunicacion serial RPI - ESP32
+int sensorPins[3] = {32, 26, 12};
 //arrays que contienen a donde van conectados los componentes
-int relayPins[4] = {2, 3, 4, 5};
-Servo escControl[4]; //23, 3, 18, 15 (se les coloca en esos pines en el setup)
+//int relayPins[4] = {2, 3, 4, 5}; ELIMINAR O CAMBIAR PINOUT DE LOS RELAY EN FUTURAS VERSIONES
+Servo escControl[4]; //23, 21, 18, 2 (se les coloca en esos pines en el setup)
 
-bool FireState = false; //ELIMINAR TODA INSTANCIA DE ESTA BANDERA EN FUTURAS VERSIONES
-int resetBoton = 6; //boton de reseteo, i guess lol
+//bool FireState = false; //ELIMINAR TODA INSTANCIA DE ESTA BANDERA EN FUTURAS VERSIONES
+//int resetBoton = 6; //boton de reseteo, i guess lol ELIMINAR TODA INSTANCIA DE ESTE BOTON
 
 bool AnalogLecture(char InPin, int limit) {
   int aux = analogRead(InPin); //lee la entrada del pin analógico que le indiquemos
@@ -33,7 +33,7 @@ String rpiReading() {
   String lecture;
 
   if (rpi.available()) {  //comprueba si hay datos seriales disponibles4
-    lecture = rpi.readStringUntil('\n');
+  lecture = rpi.readStringUntil('\n');
     lecture.trim(); //ajustamos la lectura por cualquier error que pueda ocurrir
     Serial.println("Lectura de la raspberry lol xd: " + lecture);
     return lecture; //imprimimos y guardamos el valor de la lectura obtenida
@@ -50,57 +50,66 @@ class Motor { //una clase que contiene funciones para encender y apagar las bomb
   }
 
   void On(int pulseToSend) {
-    digitalWrite(relayPins[motorNumber], HIGH);
+    //digitalWrite(relayPins[motorNumber], HIGH); A;ADIR SI SE MODIFICA LA LINEA 15
     escControl[motorNumber].write(pulseToSend); //encendemos el relay junto con el controlador del motor
+    Serial.println("Se ha encendido el motor: " + String(motorNumber+1) + ". Pulso enviado: " + String(pulseToSend));
   }
 
   void Off() {
-    digitalWrite(relayPins[motorNumber], LOW);
+    //digitalWrite(relayPins[motorNumber], LOW); A;ADIR SI SE MODIFICA LA LINEA 15
     escControl[motorNumber].write(0); //apagamos el relay junto con el controlador del motor
   }
 };
 
 Motor motors[4] = {Motor(0), Motor(1), Motor(2), Motor(3)};
 
-  void setup() {
-    Serial.begin(9600);
-    rpi.begin(9600, SERIAL_8N1, 16, 17); 
+void setup() {
+  Serial.begin(9600);
+  rpi.begin(9600, SERIAL_8N1, 16, 17); 
   //iniciamos la comunicación serial de estas cosas todas horribles (conectado al 2do puerto: 16 rx, 17 tx)
 
-    pinMode(resetBoton, INPUT_PULLUP);
+  //pinMode(resetBoton, INPUT_PULLUP);
 
-    char escControlPins[4] = {23, 3, 18, 15}; //a la derecha del controlador
+  char escControlPins[4] = {23, 21, 18, 2}; //a la izquierda del controlador
+  delay(2000);
+  Serial.println("");
+  for (int n = 0; n < 4; n++) { //aprovechando que de todo tenemos 4 metemos todo en un ciclo for para iniciar sus protocolos correspondientes  
+    Serial.println("Se ha iniciado el motor: " + String(n+1));
+    escControl[n].attach(escControlPins[n], 1000, 2000);
+    escControl[n].write(0);
+    delay(1000);
 
-    for (int n = 0; n < 4; n++) { //aprovechando que de todo tenemos 4 metemos todo en un ciclo for para iniciar sus protocolos correspondientes  
-      escControl[n].attach(escControlPins[n], 1000, 2000);
-      escControl[n].write(0);
-
-      pinMode(relayPins[n], OUTPUT);
-      //lo mismo, iniciamos los pines de los sensores y los relays
-    }
-
-    for (int n = 0; n < 3; n++) {
-      pinMode(sensorPins[n], INPUT); //pero sensores solo son 3 >:/
-    }
+    //pinMode(relayPins[n], OUTPUT); AÑADIR SOLAMENTE SI SE MODIFICA LA LINEA 15
+    //lo mismo, iniciamos los pines de los sensores y los relays
   }
 
-  void loop() {
-    int butonState = digitalRead(resetBoton);
-    if (butonState==LOW) { //Para el algoritmo: BOTON DE RESETEO, AGREGAR TODA FUNCION QUE SEA NECESARIA PARA DEJAR EN UN ESTADO NEUTRO EL PROYECTO
-        FireState = false;
-        for (int n = 0; n < 4; n++) {
-          motors[n].Off();
-        } 
-        rpi.println("reset");
-        Serial.println("Sistema Reseteado");
-      }
+  for (int n = 0; n < 3; n++) {
+    pinMode(sensorPins[n], INPUT); //pero sensores solo son 3 >:/ (asi q hay que hacer otro ciclo for)
+  }
+  delay(3000);
+}
 
-    if (FireState==false) {
-      //Para el algoritmo: AQUI VAN LAS LECTURAS (Seriales y Analogicas) QUE VAN A CAMBIAR EL ESTADO DE LA BANDERA FireState A true
-    } else {
-      //Para el algoritmo: AQUI VAN LAS FUNCIONES QUE SE VAN A EJECUTAR LUEGO DE PASAR EL ESTADO DE LA BANDERA A true (sin tomar en cuenta funcion para devolver su estado a false)
+void loop() {
+  //int butonState = digitalRead(resetBoton);
+  //if (butonState==LOW) { //Para el algoritmo: BOTON DE RESETEO, AGREGAR TODA FUNCION QUE SEA NECESARIA PARA DEJAR EN UN ESTADO NEUTRO EL PROYECTO
+    //FireState = false;
+    //for (int n = 0; n < 4; n++) {
+      //motors[n].Off();
+      //delay(1000);
+    //} 
+    //rpi.println("reset");
+    //Serial.println("Sistema Reseteado");
+  //}
+  
+  motors[0].On(100);
 
-    }
-  } 
+  //if (FireState==false) {
+  //test: solo vamos a confirmar que el motor se encienda correctamente
+  //Para el algoritmo: AQUI VAN LAS LECTURAS (Seriales y Analogicas) QUE VAN A CAMBIAR EL ESTADO DE LA BANDERA FireState A true
+  //} else {
+    //Para el algoritmo: AQUI VAN LAS FUNCIONES QUE SE VAN A EJECUTAR LUEGO DE PASAR EL ESTADO DE LA BANDERA A true (sin tomar en cuenta funcion para devolver su estado a false)
 
-  //-DemoKnight TF2
+  //}
+} 
+
+//-DemoKnight TF2
