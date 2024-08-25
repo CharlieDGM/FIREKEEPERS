@@ -1,6 +1,6 @@
 # FIREKEEPERS
 
-HoLa, somos el equipo Oppenheimers Vol. 2 de Guatemala y somos participantes de Futuros Inovadores Senior. En este repositorio se estará actualizando de los diferentes codigos que se estarán utilizando en la realización de nuestro proyecto: FIREKEEPERS.
+HoLa, somos el equipo Oppenheimers Vol. 2 de Guatemala y somos participantes de Futuros Inovadores Senior. En este repositorio se estarán subiendo los diferentes codigos para los diferentes programas que estaremos realizando, también se subiran fotos del proyecto y diferentes modelos 3D que fueron necesarios para la realización del proyecto.
 
 -[Programación Raspberry](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/Raspberry) La rasbperry servira como base central de operaciones.
 
@@ -12,3 +12,4 @@ Extras:
 -[Pruebas arduino](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/Arduino) Pruebas que se hicieron antes de la culminación del proyecto.
 
 -DemoKnight TF2
+(pq cuando vuelvo a un programa que realice hace tiempo se me olvida todo lo que hice ;-;)
