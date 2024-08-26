@@ -2,11 +2,11 @@
 
 AYOOOOO, somos el equipo Oppenheimers Vol. 2 de Guatemala y somos participantes de Futuros Inovadores Senior. En este repositorio se estarán subiendo los diferentes codigos para los diferentes programas que estaremos realizando, también se subiran fotos del proyecto y diferentes modelos 3D que fueron necesarios para la realización del proyecto.
 
--[Programación Raspberry](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/Raspberry) La rasbperry servira como base central de operaciones.
+-[Programación Raspberry](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/Raspberry/master.py) La rasbperry servira como base central de operaciones.
 
 ![Programacion Raspberry](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/imagenRaspberry.jpeg?raw=true)
 
--[Programación ESP32](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/ESP32) El ESP32 seran los "musculos" del proyecto, realizando multiples lecturas y escrituras digitales/analógicas y también mandando señales PWM a los drivers de los motores.
+-[Programación ESP32](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/ESP32/master.ino) El ESP32 seran los "musculos" del proyecto, realizando multiples lecturas y escrituras digitales/analógicas y también mandando señales PWM a los drivers de los motores.
 
 ![Programacion ESP32](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/imagenESP32.jpeg?raw=true)
 
