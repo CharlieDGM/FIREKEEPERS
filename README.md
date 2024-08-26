@@ -11,5 +11,5 @@ HoLa, somos el equipo Oppenheimers Vol. 2 de Guatemala y somos participantes de 
 Extras:
 -[Pruebas arduino](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/Arduino) Pruebas que se hicieron antes de la culminación del proyecto.
 
--DemoKnight TF2
+-DemoKnightTF2
 (pq cuando vuelvo a un programa que realice hace tiempo se me olvida todo lo que hice ;-;)
