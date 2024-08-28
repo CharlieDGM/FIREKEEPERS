@@ -11,8 +11,8 @@ import RPi.GPIO as GPIO
 from datetime import datetime
 #para conectarse y actualizar datos en la db (mariaDB)
   
-import serial
-#comunicación serial
+import socket
+#comunicación por red
 import time
   
 class dataBase:
@@ -77,32 +77,16 @@ class camaras:
           
         if percentage >= lowerLimit:
             return True
-        else:
+        else: 
               return False
-  
-def serialLecture():
-    if serial.in_waiting > 0:
-        #serial.reset_input_buffer()
-        #supuestamente es para limpiar el input pero esta linea genera mas problemas
-        mensaje = serial.readline().decode('utf-8').rstrip()
-        #por partes: se lee la linea recibida, se decodifica y se limpian los espacios en blanco
-        print(mensaje)
-        return mensaje
-              
-def serialSend(mensajeToSend):
-    if type(mensajeToSend) != str:
-        str(mensajeToSend)
-    mensaje = f"{mensajeToSend}\n"
-    serial.write(mensaje.encode('utf-8'))
-    time.sleep(0.003)
-    serial.write(mensaje.encode('utf-8'))
-    time.sleep(0.003)
-    serial.write(mensaje.encode('utf-8'))
-    time.sleep(0.003)
-    serial.write(mensaje.encode('utf-8'))
-    print(f"Enviado: {mensajeToSend}")
-          
+           
+#creamos y configuramos la conexion a la red del ESP32
+   
 if __name__ == '__main__':
+    cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    cliente.connect(('192.168.1.17', 80))
+    cliente.settimeout(10)
+    
     alreadyActivated = False
       
     cam1 = cv2.VideoCapture(0)
@@ -110,20 +94,11 @@ if __name__ == '__main__':
     cam3 = cv2.VideoCapture(4)
       
     cams = [cam1, cam2, cam3]
-    nombreVentanas = ['cam1', 'cam2', 'cam3']
+    nombreVentanas = ['Camara 1: Radahn', 'Camara 2: Taehiung', 'Camara 3: Ether']
       
-    serial = serial.Serial(
-        port='/dev/ttyS0', #ttyS0 son los pines RX y TX, el puerto de conexión puede variar
-        baudrate=9600, #no cambiar, esta sincronizado con el ESP32
-        timeout=2
-    ) #datos de conección UART
-    serial.flush()
-    #se limpia todo mensaje que exista en ese momento
     try:
         while True:
-            for n in range(3):
-                if camaras.camaraLecture(cams[n], 15, nombreVentanas[n]):
-                    print(f"Camara {n+1} True.")
+
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 dataBase.deleteAllData()
                 break
@@ -132,4 +107,4 @@ if __name__ == '__main__':
             cam.release()
                   
         cv2.destroyAllWindows()  
-        serial.close()
+        cliente.close()
