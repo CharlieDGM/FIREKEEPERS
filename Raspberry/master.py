@@ -15,41 +15,41 @@ import socket
 #comunicación por red
 import time
   
-class dataBase:
-    def addData(ubication):
-        actualDate = datetime.now()
+class database:
+    def anadirDatos(ubicacion):
+        fechaActual = datetime.now()
   
-        temporalMark = actualDate.strftime('%d-%m-%Y %H:%M:%S')
+        marcaTemporal = fechaActual.strftime('%d-%m-%Y %H:%M:%S') #almacenamos la marcatemporal para anadirla despues
   
         conn = mysql.connector.connect(
             host="localhost", 
             user="piPython", 
             password="pythonistrash", 
             database="prueba01",
-        )
+        ) #nos conectamos a la base de datos.
 
         cur = conn.cursor()
-        cur.execute("INSERT INTO incendios (ubicacion, hora) values (%s, %s);", (ubication, temporalMark))
-        conn.commit()
+        cur.execute("INSERT INTO incendios (ubicacion, hora) values (%s, %s);", (ubicacion, marcaTemporal))
+        conn.commit() #realizamos una query a la base de datos para insertar ciertos valores.
         conn.close()
-        print(f"Se han ingresado con exito los datos", str(ubication), "y la hora: ", str(temporalMark))
+        print(f"Se han ingresado con exito los datos: ", str(ubicacion), ", y la hora: ", str(marcaTemporal))
   
-    def deleteAllData():
+    def borrarTodo():
         conn = mysql.connector.connect(
             host="localhost", 
             user="piPython", 
             password="pythonistrash", 
-            database="prueba01",
+            database="prueba01", #ingresamos a la base de datos.
         )
   
         cur = conn.cursor()
         cur.execute("DELETE FROM incendios;")
         conn.commit()
-        conn.close()
-        print("Se han eliminado todos los datos de la tabla.")
+        conn.close() #ejecutamos una query que elimina la tabla actuar
+        print("Todos los datos se han eliminado de la base de datos.")
   
 class camaras:
-    def camaraLecture(cam, lowerLimit, nombreVentana):
+    def lecture(cam, lowerLimit, nombreVentana):
         _, preFrame = cam.read()
         frame = cv2.flip(preFrame, 0)
         #(lo primero es para obtener un valor que no necesitamos xdd)
@@ -85,23 +85,47 @@ class camaras:
 if __name__ == '__main__':
     cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     cliente.connect(('192.168.1.17', 80))
-    cliente.settimeout(10)
+    cliente.settimeout(10) #configuramos y realizamos una coneccion de red atraves de un socket
     
-    alreadyActivated = False
-      
     cam1 = cv2.VideoCapture(0)
     cam2 = cv2.VideoCapture(2)
     cam3 = cv2.VideoCapture(4)
       
     cams = [cam1, cam2, cam3]
     nombreVentanas = ['Camara 1: Radahn', 'Camara 2: Taehiung', 'Camara 3: Ether']
-      
+    respuestas = ["derecha\n", "frente\n", "izquierda\n"]
+    #Creamos los diferentes objetos y listas que utilizaremos para facilitar el algoritmo
+    
+    time.sleep(3.5)
     try:
         while True:
-
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                dataBase.deleteAllData()
-                break
+            try:
+                #Se realiza un ping para mantener la conexion xd
+                mensaje = "Piiing\n"
+                #y lo modificamos si se detecta un cambio en la camara
+                
+                for n in range(3):
+                    if camaras.lecture(cams[n], 30, nombreVentanas[n]):
+                        mensaje = respuestas[n]
+                        print(f"Cambio detectado. Camara: {respuestas[n]}")
+                
+                cliente.send(mensaje.encode('utf-8'))
+                time.sleep(0.6)
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    database.borrarTodo()
+                    break
+                
+            except socket.timeout:
+                print("Error de conexion. Reconectando esta cosa xdd...")
+                cliente.close()
+                cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #si hay timeout cerramos y volvemos a abrir el objeto
+                cliente.connect(('192.168.1.17', 80)) #realizamos reconeccion
+                
+            except socket.error as e:
+                print(f"Error de socket: {e}")
+                cliente.close() #lo mismo pero con algun error estandar de socket
+                cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                cliente.connect(('192.168.1.17', 80)) #realizamos reconeccion
     finally:
         for cam in cams:
             cam.release()
