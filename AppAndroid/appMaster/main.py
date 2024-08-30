@@ -2,7 +2,7 @@
 #codigo de una aplicación básica para conectarse y verificar de forma continua los contenidos de una tabla
 #de un servidor remoto, el algoritmo principal fue echo con mysql-connector, todo lo demas solo son 
 #declaración de objetos necesarias para la Interfaz Gráfica (que me gustaria que no fuera tan horrible de trabajar)
-#en fin, este es un codigo de prueba para ver como reacciona el codigo en diferentes entornos :P
+#en fin, este es un codigo básico que servira para el proposito simple que tenemos que cumplir :p
 #==================================================================================================================
 
 #importamos diferentes librearias para el correcto funcionamiento del codigo
@@ -15,12 +15,14 @@ from kivy.clock import Clock
 
 import mysql.connector
 from plyer import notification
+from plyer import vibrator
 
 #clase principal que almacena todos los contenidos de la interfaz gráfica
 class AplicacionMYSQLDB(App):
     def __init__(self, **kwargs):
         super(AplicacionMYSQLDB, self).__init__(**kwargs)
         self.ultima_marca_tiempo = None
+        self.notificacionActivada = False
 
     def build(self):
 
@@ -55,6 +57,9 @@ class AplicacionMYSQLDB(App):
 
         # Widget del boton que activa la funcion de...... CLICKBOTON genial, aveces me amo mucho
         main_layout.add_widget(Button(text='Ver Tabla', on_press=self.clickBoton, font_size=label_font_size))
+        #Boton que reinicia el sistema de notificación.
+        self.resetButton = Button(text='Reiniciar', on_press=self.resetNotificacion, font_size=label_font_size)
+        main_layout.add_widget(self.resetButton)
 
         # Cuadro de texto donde se imprimira el resultado de la query
         self.cuadroTexto = TextInput(multiline=True, font_size=textoHeight, height=450, size_hint_y=None)
@@ -83,14 +88,19 @@ class AplicacionMYSQLDB(App):
             column_names = [nomCol[0] for nomCol in cursor.fetchall()] #array que contendra todos los nombres de las columnas
             self.cuadroTexto.text += ', '.join(column_names) + "\n" #imprimimos en el texto (esta linea no la termino de comprender pero funciona, lol)
 
-            cursor.execute(f"SELECT * FROM {tabla_}") #Query que los datos de la tabla
+            cursor.execute(f"SELECT * FROM {tabla_}") #Query que lee los datos de la tabla
             rows = cursor.fetchall() #guardamos los datos en "rows"
 
             if self.haCambiadoDatos(rows):
-                notification.notify(
-                    title='Se ha registrado un incendio!',
-                    message='Sigue las instrucciones de las autoridades de tu area',
-                )
+                if self.notificacionActivada != True:
+                    notification.notify(
+                        title='Se ha registrado un incendio!',
+                        message='Sigue las instrucciones de las autoridades de tu area',
+                        app_name='FIRE ALARM',
+                        app_icon='logo.jpg',
+                    )
+                    vibrator.vibrate(time=5)
+                    self.notificacionActivada = True
 
             for row in rows: #ahora ejecutamos un ciclo que imprimira todos los datos que se encuentren en la tabla
                 self.cuadroTexto.text += str(row) + "\n"
@@ -107,21 +117,16 @@ class AplicacionMYSQLDB(App):
                 conn.close()
 
     def clickBoton(self, instance): #funcion que se ejecuta al pulsar el boton
-        #función dentro de la función, la llamamos cada 7 segundos
         def actualizarDatos(dt):
             host_in = self.hostEntry.text #Obtenemos las credenciales desde loscuadros de texto
             user_in = self.userEntry.text
             password_in = self.passwordEntry.text
             database_in = self.databaseEntry.text
             tabla_in = self.tablaEntry.text
-            
-            #borramos los widgets para que la app se vea mas chulis xd
-            for widget in self.root.children:
-                if widget != self.cuadroTexto:
-                    self.root.remove_widget(widget)
 
-            #habilitamos para que el cuadro de texto ocupe el especio vacio
+            #habilitamos para que el cuadro de texto y el boton de reseteo para que ocupe el especio vacio
             self.cuadroTexto.size_hint_y = 1.0
+            self.resetButton.size_hint_y = 1.0
 
             #yyyyy porfin ejecutamos la funcion mandando las credenciales a la funcion
             self.verTabla(host_in, user_in, password_in, database_in, tabla_in)
@@ -147,9 +152,13 @@ class AplicacionMYSQLDB(App):
             return True #devolvemos verdadero
         
         return False
+    
+    def resetNotificacion(self, instance):
+        try:
+            self.notificacionActivada = False
+        except Exception as e: #reseteamos la variable que condiciona si sale o no la notificación
+            print(f"error al reiniciar la notificacion: {str(e)}")
             
-        
-
 #el equivalente al while True en esta interfaz gráfica, iniciamos el loop que contiene toda la aplicación
 if __name__ == '__main__':
     app = AplicacionMYSQLDB()
