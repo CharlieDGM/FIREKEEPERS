@@ -1,6 +1,7 @@
 # FIREKEEPERS
 
-AYOOOOO, somos el equipo Oppenheimers Vol. 2 de Guatemala y somos participantes de Futuros Inovadores Senior. En este repositorio se estarán subiendo los diferentes codigos para los diferentes programas que estaremos realizando, también se subiran fotos del proyecto y diferentes modelos 3D que fueron necesarios para la realización del proyecto. (si la programacion esta en ingles y español es porque quisiera programar en ingles pero la competencia y todo es en español--?¿¿ xd¿)
+AYOOOOO, somos el equipo Oppenheimers Vol. 2 de Guatemala y somos participantes de Futuros Inovadores Senior. En este repositorio se estarán subiendo los diferentes codigos para los diferentes programas que estaremos realizando, también se subiran fotos del proyecto y diferentes archivos que fueron necesarios para la realización del proyecto. (si la programacion esta en ingles y español es porque quisiera programar en ingles pero la competencia y todo es en español--?¿¿ xd¿)
+-[Fotos del proyecto](https://github.com/CharlieDGM/FIREKEEPERS/tree/main/CONSTANCIA%20DE%20FABRICACION) Fotos que tomamos de la realización del proyecto c:
 
 -[Programación Raspberry](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/Raspberry/master.py) La rasbperry servira como base central de operaciones.
 
