@@ -83,7 +83,7 @@ void setup() {
   Serial.println("");
   Serial.println("Encendiendo...");
   delay(4000);
-  for (int n = 0; n < 3; n++) { //aprovechando que de todo tenemos 4 metemos todo en un ciclo for para iniciar sus protocolos correspondientes  
+  for (int n = 0; n < 4; n++) { //aprovechando que de todo tenemos 4 metemos todo en un ciclo for para iniciar sus protocolos correspondientes  
     Serial.println("Encendiendo el motor: " + String(n+1));
     escControl[n].attach(escControlPins[n], 1000, 2000);
     escControl[n].write(0);
@@ -122,7 +122,6 @@ void setup() {
 
   Serial.println("=======================================================");
   Serial.println("Iniciando todo pipipipipi... (3.14 3.14 3.14 3.14 3.14)");
-  delay(3000);
 }
 
 String mensajesRPI[3] = {"derecha", "frente", "izquierda"}; 
@@ -141,18 +140,18 @@ void loop() {
       }
       
       int lecturaSensor = analogRead(sensorPins[0]);
-      //Serial.println(lecturaSensor);
+      Serial.println(lecturaSensor);
       if (controlarMotores(lecturaSensor)) {
         cliente.println("encendido");
         delay(3000);
-      } else {
+      } else { //dependiendo de las diferentes lecturas mandamos los datos al Raspberry y encendemos o apagamos los motores
         cliente.println("apagado");
         delay(1000);
       }
 
       for (int n = 0; n < 3; n++) {
         if (mensaje == mensajesRPI[n]) {
-          encender(n);
+          encender(n); 
           Serial.println("Se ha detectado fuego en la camara: " + String(n+1));
           delay(6000);
         }
