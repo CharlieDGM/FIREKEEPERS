@@ -83,8 +83,11 @@ class camaras:
 #creamos y configuramos la conexion a la red del ESP32
    
 if __name__ == '__main__':
+    ipServer = '192.168.1.2'
+    puerto = 80
+    
     cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    cliente.connect(('192.168.1.17', 80))
+    cliente.connect((ipServer, puerto))
     cliente.settimeout(10) #configuramos y realizamos una coneccion de red atraves de un socket
     
     cam1 = cv2.VideoCapture(0)
@@ -97,20 +100,25 @@ if __name__ == '__main__':
     #Creamos los diferentes objetos y listas que utilizaremos para facilitar el algoritmo
     
     time.sleep(3.5)
+    ultimoEnvio = time.time()
     try:
         while True:
             try:
-                #Se realiza un ping para mantener la conexion xd
-                mensaje = "Piiing\n"
-                #y lo modificamos si se detecta un cambio en la camara
-                
+                tiempoActual = time.time()
                 for n in range(3):
                     if camaras.lecture(cams[n], 30, nombreVentanas[n]):
                         mensaje = respuestas[n]
-                        print(f"Cambio detectado. Camara: {respuestas[n]}")
+                        if tiempoActual - ultimoEnvio >= 6:
+                            cliente.send(mensaje.encode('utf-8'))
+                            print(f"Cambio detectado. Camara: {respuestas[n]}")
+                            ultimoEnvio = tiempoActual
+                mensajeESP = cliente.recv(1024).decode('utf-8').rstrip()
+                if mensajeESP:
+                    print(f"Mensaje del ESP32: {mensajeESP}")
+                    if mensajeESP == "encendido":
+                        database.anadirDatos("general")
+                        #print(f"Se han anadido los datos a la base de datos")
                 
-                cliente.send(mensaje.encode('utf-8'))
-                time.sleep(0.6)
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     database.borrarTodo()
                     break
@@ -119,13 +127,13 @@ if __name__ == '__main__':
                 print("Error de conexion. Reconectando esta cosa xdd...")
                 cliente.close()
                 cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #si hay timeout cerramos y volvemos a abrir el objeto
-                cliente.connect(('192.168.1.17', 80)) #realizamos reconeccion
+                cliente.connect((ipServer, puerto)) #realizamos reconeccion
                 
             except socket.error as e:
                 print(f"Error de socket: {e}")
                 cliente.close() #lo mismo pero con algun error estandar de socket
                 cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                cliente.connect(('192.168.1.17', 80)) #realizamos reconeccion
+                cliente.connect((ipServer, puerto)) #realizamos reconeccion
     finally:
         for cam in cams:
             cam.release()
