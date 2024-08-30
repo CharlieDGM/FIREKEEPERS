@@ -99,28 +99,31 @@ if __name__ == '__main__':
     respuestas = ["derecha\n", "frente\n", "izquierda\n"]
     #Creamos los diferentes objetos y listas que utilizaremos para facilitar el algoritmo
     
-    time.sleep(3.5)
-    ultimoEnvio = time.time()
+    time.sleep(3.5) 
+    ultimoEnvio = time.time() #almacenamos esta variable para utilizarla de intervalo inicial
+    database.anadirDatos("LetMeSoloHer") #Anadimos algo basico para que la aplicacion funcione correctamente
     try:
         while True:
             try:
-                tiempoActual = time.time()
-                for n in range(3):
+                tiempoActual = time.time() #En cada iteracion se actualiza el tiempo actual
+                for n in range(3): #lo ejecutamos por cada camara que tenemos
                     if camaras.lecture(cams[n], 30, nombreVentanas[n]):
-                        mensaje = respuestas[n]
-                        if tiempoActual - ultimoEnvio >= 6:
-                            cliente.send(mensaje.encode('utf-8'))
+                        mensaje = respuestas[n] #si da verdadero cambiamos el valor del string
+                        if tiempoActual - ultimoEnvio >= 6: #si el intervalo ya paso...
+                            cliente.send(mensaje.encode('utf-8')) #enviamos el string al ESP32
                             print(f"Cambio detectado. Camara: {respuestas[n]}")
-                            ultimoEnvio = tiempoActual
+                            ultimoEnvio = tiempoActual #reiniciamos el intervalo
+                            database.anadirDatos("respuestas[n]") #anadimos la direccion a la base de datos
                 mensajeESP = cliente.recv(1024).decode('utf-8').rstrip()
-                if mensajeESP:
+                if mensajeESP: #si se recibe un mensaje del ESP32
                     print(f"Mensaje del ESP32: {mensajeESP}")
                     if mensajeESP == "encendido":
-                        database.anadirDatos("general")
+                        database.anadirDatos("general") #anadimos a la base de datos.
                         #print(f"Se han anadido los datos a la base de datos")
                 
                 if cv2.waitKey(1) & 0xFF == ord('q'):
                     database.borrarTodo()
+                    cliente.close()
                     break
                 
             except socket.timeout:
