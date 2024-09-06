@@ -21,51 +21,47 @@ from plyer import vibrator
 class AplicacionMYSQLDB(App):
     def __init__(self, **kwargs):
         super(AplicacionMYSQLDB, self).__init__(**kwargs)
-        self.ultima_marca_tiempo = None
+        self.ultimaMarcaTiempo = None
         self.notificacionActivada = False
 
     def build(self):
 
         #layout principal de la applicación, donde todos los objetos seran puestos
-        main_layout = BoxLayout(orientation='vertical', spacing=0)
+        mainLayout = BoxLayout(orientation='vertical', spacing=0)
 
         #definimos diferentes tamaños para el texto xd
-        label_font_size = 25
-        input_font_size = 25
+        labelFontSize = 25
+        inputFontSize = 25
         textoHeight = 25
 
         #Creamos todos los widgets y los insertamos en el layout
-        main_layout.add_widget(Label(text='Host:', font_size=label_font_size)) # Host
-        self.hostEntry = TextInput(multiline=False, font_size=input_font_size)
-        main_layout.add_widget(self.hostEntry) 
+        self.hostEntry = TextInput(hint_text='Host',multiline=False, font_size=inputFontSize)
+        mainLayout.add_widget(self.hostEntry) 
 
-        main_layout.add_widget(Label(text='Usuario:', font_size=label_font_size))  # Usuario
-        self.userEntry = TextInput(multiline=False, font_size=input_font_size)
-        main_layout.add_widget(self.userEntry)  
+        self.userEntry = TextInput(hint_text='Usuario',multiline=False, font_size=inputFontSize)
+        mainLayout.add_widget(self.userEntry)  
 
-        main_layout.add_widget(Label(text='Contraseña:', font_size=label_font_size))  # Contraseña
-        self.passwordEntry = TextInput(password=True, multiline=False, font_size=input_font_size)
-        main_layout.add_widget(self.passwordEntry)  
+        self.passwordEntry = TextInput(hint_text='Contrasena',password=True, multiline=False, font_size=inputFontSize)
+        mainLayout.add_widget(self.passwordEntry)  
 
-        main_layout.add_widget(Label(text='Database:', font_size=label_font_size))  # Base de Datos
-        self.databaseEntry = TextInput(multiline=False, font_size=input_font_size)
-        main_layout.add_widget(self.databaseEntry)  
+        self.databaseEntry = TextInput(hint_text='Base de datos',multiline=False, font_size=inputFontSize)
+        mainLayout.add_widget(self.databaseEntry)  
 
-        main_layout.add_widget(Label(text='Tabla:', font_size=label_font_size))  # Tabla
-        self.tablaEntry = TextInput(multiline=False, font_size=input_font_size)
-        main_layout.add_widget(self.tablaEntry)  
+        self.tablaEntry = TextInput(hint_text='tabla',multiline=False, font_size=inputFontSize)
+        mainLayout.add_widget(self.tablaEntry)  
 
         # Widget del boton que activa la funcion de...... CLICKBOTON genial, aveces me amo mucho
-        main_layout.add_widget(Button(text='Ver Tabla', on_press=self.clickBoton, font_size=label_font_size))
-        #Boton que reinicia el sistema de notificación.
-        self.resetButton = Button(text='Reiniciar', on_press=self.resetNotificacion, font_size=label_font_size)
-        main_layout.add_widget(self.resetButton)
+        mainLayout.add_widget(Button(text='Ver Tabla', on_press=self.clickBoton, font_size=labelFontSize))
 
         # Cuadro de texto donde se imprimira el resultado de la query
         self.cuadroTexto = TextInput(multiline=True, font_size=textoHeight, height=450, size_hint_y=None)
-        main_layout.add_widget(self.cuadroTexto)
+        mainLayout.add_widget(self.cuadroTexto)
 
-        return main_layout #devolvemos el layout
+        #Boton que reinicia el sistema de notificación.
+        self.resetButton = Button(text='Reiniciar', on_press=self.resetNotificacion, font_size=labelFontSize)
+        mainLayout.add_widget(self.resetButton)        
+
+        return mainLayout #devolvemos el layout
 
     def verTabla(self, host_, user_, password_, database_, tabla_):
         #funcion principal del codigo, lo mas facil
@@ -85,17 +81,20 @@ class AplicacionMYSQLDB(App):
             #===================================
 
             cursor.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{tabla_}';") #ejecutamos una query con la credencial de la tabla
-            column_names = [nomCol[0] for nomCol in cursor.fetchall()] #array que contendra todos los nombres de las columnas
-            self.cuadroTexto.text += ', '.join(column_names) + "\n" #imprimimos en el texto (esta linea no la termino de comprender pero funciona, lol)
+            columnNames = [nomCol[0] for nomCol in cursor.fetchall()] #array que contendra todos los nombres de las columnas
+            self.cuadroTexto.text += ', '.join(columnNames) + "\n" #imprimimos en el texto (esta linea no la termino de comprender pero funciona, lol)
 
             cursor.execute(f"SELECT * FROM {tabla_}") #Query que lee los datos de la tabla
             rows = cursor.fetchall() #guardamos los datos en "rows"
 
             if self.haCambiadoDatos(rows):
                 if self.notificacionActivada != True:
+                    lugarIncendio = rows[-1][-2]
+                    textoLimpio = ''.join(c for c in lugarIncendio if c not in "/n")
+
                     notification.notify(
                         title='Se ha registrado un incendio!',
-                        message='Sigue las instrucciones de las autoridades de tu area',
+                        message=f'Ubicacion incendio: {textoLimpio}',
                         app_name='FIRE ALARM',
                         app_icon='logo.jpg',
                     )
@@ -117,6 +116,12 @@ class AplicacionMYSQLDB(App):
                 conn.close()
 
     def clickBoton(self, instance): #funcion que se ejecuta al pulsar el boton
+        for widget in self.root.children:
+                if widget != self.cuadroTexto:
+                    self.root.remove_widget(widget)
+
+        self.mainLayout.orientation = 'horizontal'
+
         def actualizarDatos(dt):
             host_in = self.hostEntry.text #Obtenemos las credenciales desde loscuadros de texto
             user_in = self.userEntry.text
@@ -138,17 +143,17 @@ class AplicacionMYSQLDB(App):
         if not rows:
             return False #NO hay datos tons es falso
         
-        ultima_marca_tiempo_tabla = rows[-1][-1] #la marca temporal se encuentra al final
+        ultimaMarcaTiempoTabla = rows[-1][-1] #la marca temporal se encuentra al final
 
-        if self.ultima_marca_tiempo is None:
+        if self.ultimaMarcaTiempo is None:
             #es la primera vez que se verifica, actualizamos el valor de la marca temporal
-            self.ultima_marca_tiempo = ultima_marca_tiempo_tabla 
+            self.ultimaMarcaTiempo = ultimaMarcaTiempoTabla 
             return False # No hay cambios por ser la primera verificación (creo xd?)
         
 
-        if ultima_marca_tiempo_tabla > self.ultima_marca_tiempo:
+        if ultimaMarcaTiempoTabla > self.ultimaMarcaTiempo:
             #si son datos diferentes entonces si hay cambio 
-            self.ultima_marca_tiempo = ultima_marca_tiempo_tabla
+            self.ultimaMarcaTiempo = ultimaMarcaTiempoTabla
             return True #devolvemos verdadero
         
         return False
