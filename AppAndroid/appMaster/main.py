@@ -12,6 +12,7 @@ from kivy.uix.label import Label
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 from kivy.clock import Clock
+from kivy.config import Config
 
 import mysql.connector
 from plyer import notification
@@ -27,7 +28,7 @@ class AplicacionMYSQLDB(App):
     def build(self):
 
         #layout principal de la applicación, donde todos los objetos seran puestos
-        mainLayout = BoxLayout(orientation='vertical', spacing=0)
+        self.mainLayout = BoxLayout(orientation='vertical', spacing=0)
 
         #definimos diferentes tamaños para el texto xd
         labelFontSize = 25
@@ -36,32 +37,33 @@ class AplicacionMYSQLDB(App):
 
         #Creamos todos los widgets y los insertamos en el layout
         self.hostEntry = TextInput(hint_text='Host',multiline=False, font_size=inputFontSize)
-        mainLayout.add_widget(self.hostEntry) 
+        self.mainLayout.add_widget(self.hostEntry) 
 
         self.userEntry = TextInput(hint_text='Usuario',multiline=False, font_size=inputFontSize)
-        mainLayout.add_widget(self.userEntry)  
+        self.mainLayout.add_widget(self.userEntry)  
 
         self.passwordEntry = TextInput(hint_text='Contrasena',password=True, multiline=False, font_size=inputFontSize)
-        mainLayout.add_widget(self.passwordEntry)  
+        self.mainLayout.add_widget(self.passwordEntry)  
 
         self.databaseEntry = TextInput(hint_text='Base de datos',multiline=False, font_size=inputFontSize)
-        mainLayout.add_widget(self.databaseEntry)  
+        self.mainLayout.add_widget(self.databaseEntry)  
 
-        self.tablaEntry = TextInput(hint_text='tabla',multiline=False, font_size=inputFontSize)
-        mainLayout.add_widget(self.tablaEntry)  
+        self.tablaEntry = TextInput(hint_text='Tabla',multiline=False, font_size=inputFontSize)
+        self.mainLayout.add_widget(self.tablaEntry)  
 
         # Widget del boton que activa la funcion de...... CLICKBOTON genial, aveces me amo mucho
-        mainLayout.add_widget(Button(text='Ver Tabla', on_press=self.clickBoton, font_size=labelFontSize))
+        self.verTablaButton = Button(text='Ver Tabla', on_press=self.clickBoton, font_size=labelFontSize,background_normal='', background_color=[0.204, 0.745, 0.318, 1])
+        self.mainLayout.add_widget(self.verTablaButton)
 
         # Cuadro de texto donde se imprimira el resultado de la query
         self.cuadroTexto = TextInput(multiline=True, font_size=textoHeight, height=450, size_hint_y=None)
-        mainLayout.add_widget(self.cuadroTexto)
+        self.mainLayout.add_widget(self.cuadroTexto)
 
         #Boton que reinicia el sistema de notificación.
-        self.resetButton = Button(text='Reiniciar', on_press=self.resetNotificacion, font_size=labelFontSize)
-        mainLayout.add_widget(self.resetButton)        
+        self.resetButton = Button(text='Reiniciar', on_press=self.resetNotificacion, font_size=labelFontSize,background_normal='', background_color=[0.212, 0.976, 0.937, 1])
+        self.mainLayout.add_widget(self.resetButton)        
 
-        return mainLayout #devolvemos el layout
+        return self.mainLayout #devolvemos el layout
 
     def verTabla(self, host_, user_, password_, database_, tabla_):
         #funcion principal del codigo, lo mas facil
@@ -116,11 +118,12 @@ class AplicacionMYSQLDB(App):
                 conn.close()
 
     def clickBoton(self, instance): #funcion que se ejecuta al pulsar el boton
-        for widget in self.root.children:
-                if widget != self.cuadroTexto:
-                    self.root.remove_widget(widget)
-
-        self.mainLayout.orientation = 'horizontal'
+        self.root.remove_widget(self.hostEntry)
+        self.root.remove_widget(self.userEntry)
+        self.root.remove_widget(self.passwordEntry)
+        self.root.remove_widget(self.databaseEntry)
+        self.root.remove_widget(self.tablaEntry)
+        self.root.remove_widget(self.verTablaButton)
 
         def actualizarDatos(dt):
             host_in = self.hostEntry.text #Obtenemos las credenciales desde loscuadros de texto
