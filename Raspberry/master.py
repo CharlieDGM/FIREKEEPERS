@@ -32,7 +32,7 @@ class database:
         cur.execute("INSERT INTO incendios (ubicacion, hora) values (%s, %s);", (ubicacion, marcaTemporal))
         conn.commit() #realizamos una query a la base de datos para insertar ciertos valores.
         conn.close()
-        print(f"Se han ingresado con exito los datos: ", str(ubicacion), ", y la hora: ", str(marcaTemporal))
+        print(f"Data inserted into the database: ", str(ubicacion), ". Time: ", str(marcaTemporal))
   
     def borrarTodo():
         conn = mysql.connector.connect(
@@ -46,12 +46,11 @@ class database:
         cur.execute("DELETE FROM incendios;")
         conn.commit()
         conn.close() #ejecutamos una query que elimina la tabla actuar
-        print("Todos los datos se han eliminado de la base de datos.")
+        print("Table deleted")
   
 class camaras:
     def lecture(cam, lowerLimit, nombreVentana):
-        _, preFrame = cam.read()
-        frame = cv2.flip(preFrame, 0)
+        _, frame = cam.read()
         #(lo primero es para obtener un valor que no necesitamos xdd)
         #obtenemos una lectura de la camara y volteamos la imagen porque las camaras estan al reves xdd
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -83,7 +82,7 @@ class camaras:
 #creamos y configuramos la conexion a la red del ESP32
    
 if __name__ == '__main__':
-    ipServer = '192.168.1.2'
+    ipServer = '192.168.1.9'
     puerto = 80
     
     cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -96,7 +95,7 @@ if __name__ == '__main__':
       
     cams = [cam1, cam2, cam3]
     nombreVentanas = ['Camara 1: Radahn', 'Camara 2: Taehiung', 'Camara 3: Ether']
-    respuestas = ["derecha\n", "frente\n", "izquierda\n"]
+    respuestas = ["right\n", "front\n", "left\n"]
     #Creamos los diferentes objetos y listas que utilizaremos para facilitar el algoritmo
     
     time.sleep(3.5) 
@@ -111,13 +110,13 @@ if __name__ == '__main__':
                         mensaje = respuestas[n] #si da verdadero cambiamos el valor del string
                         if tiempoActual - ultimoEnvio >= 6: #si el intervalo ya paso...
                             cliente.send(mensaje.encode('utf-8')) #enviamos el string al ESP32
-                            print(f"Cambio detectado. Camara: {respuestas[n]}")
+                            print(f"Change detected. Camara: {respuestas[n]}")
                             ultimoEnvio = tiempoActual #reiniciamos el intervalo
-                            database.anadirDatos("respuestas[n]") #anadimos la direccion a la base de datos
+                            database.anadirDatos(f"{respuestas[n]}") #anadimos la direccion a la base de datos
                 mensajeESP = cliente.recv(1024).decode('utf-8').rstrip()
                 if mensajeESP: #si se recibe un mensaje del ESP32
-                    print(f"Mensaje del ESP32: {mensajeESP}")
-                    if mensajeESP == "encendido":
+                    print(f"Message from ESP32: {mensajeESP}")
+                    if mensajeESP == "turnOn":
                         database.anadirDatos("general") #anadimos a la base de datos.
                         #print(f"Se han anadido los datos a la base de datos")
                 
@@ -127,13 +126,13 @@ if __name__ == '__main__':
                     break
                 
             except socket.timeout:
-                print("Error de conexion. Reconectando esta cosa xdd...")
+                print("Conection error. Try'na reconect this B A D B O Y")
                 cliente.close()
                 cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #si hay timeout cerramos y volvemos a abrir el objeto
                 cliente.connect((ipServer, puerto)) #realizamos reconeccion
                 
             except socket.error as e:
-                print(f"Error de socket: {e}")
+                print(f"Socket error LMAO: {e}")
                 cliente.close() #lo mismo pero con algun error estandar de socket
                 cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 cliente.connect((ipServer, puerto)) #realizamos reconeccion
@@ -143,3 +142,4 @@ if __name__ == '__main__':
                   
         cv2.destroyAllWindows()  
         cliente.close()
+        database.borrarTodo()
