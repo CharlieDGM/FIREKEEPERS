@@ -1,26 +1,27 @@
 # FIREKEEPERS
 
-AYOOOOO, somos el equipo Oppenheimers Vol. 2 de Guatemala y somos participantes de Futuros Inovadores Senior. En este repositorio se estarán subiendo los diferentes codigos para los diferentes programas que estaremos realizando, también se subiran fotos del proyecto y diferentes archivos que fueron necesarios para la realización del proyecto. (si la programacion esta en ingles y español es porque quisiera programar en ingles pero la competencia y todo es en español--?¿¿ xd¿)
--[Fotos del proyecto](https://github.com/CharlieDGM/FIREKEEPERS/tree/main/CONSTANCIA%20DE%20FABRICACION) Fotos que tomamos de la realización del proyecto c:
+AYOOOOO, we are the team "Oppenheimers Vol.2" from Guatemala, and we are participants of Future Innovators Senior. In this repository we will be uploading the codes for the different programs that we are creating. Also, we will be uploading photos of the proyect fabrication and different files that were necessary for the proyect. (yeah, if you find that the programation is made in english and spanish is because, well we are from Guatemala and i find kinda easy to make programs in both lenguages xddddxdxdxdxdxdxdxd)
+-[Photos of the proyect](https://github.com/CharlieDGM/FIREKEEPERS/tree/main/CONSTANCIA%20DE%20FABRICACION) Photos that we took during the fabrication of the proyect :)
 
--[Programación Raspberry](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/Raspberry/master.py) La rasbperry servira como base central de operaciones.
+-[RaspberryPI 4 Programation](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/Raspberry/master.py) The RaspberryPI is in charge of making different digital proceses that involve databases and artifical vision.
 
-![Programacion Raspberry](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/imagenRaspberry.jpeg?raw=true)
+![Raspberry Programation](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/imagenRaspberry.jpeg?raw=true)
 
--[Programación ESP32](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/ESP32/master.ino) El ESP32 seran los "musculos" del proyecto, realizando multiples lecturas y escrituras digitales/analógicas y también mandando señales PWM a los drivers de los motores.
+-[ESP32 Programation](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/ESP32/master.ino) The ESP32 is in charge of the heavy duty of the proyect. It makes analog readings ands sends pwm signals to the ESCs. It also hosts a local server.
 
-![Programacion ESP32](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/imagenESP32.jpeg?raw=true)
+![ESP32 Programation](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/imagenESP32.jpeg?raw=true)
 
--[Programación SQLapp](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/AppAndroid/appMaster) La aplicación sera un complemento del proyecto, mandando notificaciones al telefono cuando se detecten los multiples incendios.
+-[SQLapp Programation](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/AppAndroid/appMaster) The aplication is a complement of our proyect. It sends notification to the phones when a fire is detected
 
-![Interfaz de la APP](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/imagenAPP.jpeg?raw=true)
+![APP interface](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/imagenAPP.jpeg?raw=true)
 
--[PCB](https://github.com/CharlieDGM/FIREKEEPERS/tree/main/PCB) Placa de circuito impreso en la que se encuentra el ESP32 y las diferentes conexiones electricas del proyecto.
+-[PCB](https://github.com/CharlieDGM/FIREKEEPERS/tree/main/PCB) Printed board circuit that holds the esp32 and the electronic connections of the proyect.
 
-![Esquematico del PCB](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/PCB/FIREKEEPERS-SCHEMATIC.png?raw=true)
+![PCB Schematic](https://github.com/CharlieDGM/FIREKEEPERS/blob/main/PCB/FIREKEEPERS-SCHEMATIC.png?raw=true)
 
 Extras:
--[Pruebas arduino](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/Arduino) Pruebas que se hicieron antes de la culminación del proyecto.
+-[Tests](https://github.com/CharlieDGM/WRO2024-GT-VR/tree/main/Arduino) Tests that we made before concluding our proyect.
 
 -DemoKnightTF2
 (pq cuando vuelvo a un programa que realice hace tiempo se me olvida todo lo que hice ;-;)
+(why i always forget what my program does when i come back to it after a long time ;-;)
