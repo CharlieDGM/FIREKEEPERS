@@ -13,6 +13,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 from kivy.clock import Clock
 from kivy.config import Config
+from kivy.core.audio import SoundLoader
 
 import mysql.connector
 from plyer import notification
@@ -39,20 +40,20 @@ class AplicacionMYSQLDB(App):
         self.hostEntry = TextInput(hint_text='Host',multiline=False, font_size=inputFontSize)
         self.mainLayout.add_widget(self.hostEntry) 
 
-        self.userEntry = TextInput(hint_text='Usuario',multiline=False, font_size=inputFontSize)
+        self.userEntry = TextInput(hint_text='User',multiline=False, font_size=inputFontSize)
         self.mainLayout.add_widget(self.userEntry)  
 
-        self.passwordEntry = TextInput(hint_text='Contrasena',password=True, multiline=False, font_size=inputFontSize)
+        self.passwordEntry = TextInput(hint_text='Password',password=True, multiline=False, font_size=inputFontSize)
         self.mainLayout.add_widget(self.passwordEntry)  
 
-        self.databaseEntry = TextInput(hint_text='Base de datos',multiline=False, font_size=inputFontSize)
+        self.databaseEntry = TextInput(hint_text='DataBase',multiline=False, font_size=inputFontSize)
         self.mainLayout.add_widget(self.databaseEntry)  
 
-        self.tablaEntry = TextInput(hint_text='Tabla',multiline=False, font_size=inputFontSize)
+        self.tablaEntry = TextInput(hint_text='Table',multiline=False, font_size=inputFontSize)
         self.mainLayout.add_widget(self.tablaEntry)  
 
         # Widget del boton que activa la funcion de...... CLICKBOTON genial, aveces me amo mucho
-        self.verTablaButton = Button(text='Ver Tabla', on_press=self.clickBoton, font_size=labelFontSize,background_normal='', background_color=[0.204, 0.745, 0.318, 1])
+        self.verTablaButton = Button(text='Start', on_press=self.clickBoton, font_size=labelFontSize,background_normal='', background_color=[0.204, 0.745, 0.318, 1], color=[0.22, 0.246, 0.289, 1])
         self.mainLayout.add_widget(self.verTablaButton)
 
         # Cuadro de texto donde se imprimira el resultado de la query
@@ -60,7 +61,7 @@ class AplicacionMYSQLDB(App):
         self.mainLayout.add_widget(self.cuadroTexto)
 
         #Boton que reinicia el sistema de notificación.
-        self.resetButton = Button(text='Reiniciar', on_press=self.resetNotificacion, font_size=labelFontSize,background_normal='', background_color=[0.212, 0.976, 0.937, 1])
+        self.resetButton = Button(text='Reset', on_press=self.resetNotificacion, font_size=labelFontSize,background_normal='', background_color=[0.212, 0.976, 0.937, 1], color=[0.22, 0.246, 0.289, 1])
         self.mainLayout.add_widget(self.resetButton)        
 
         return self.mainLayout #devolvemos el layout
@@ -95,11 +96,13 @@ class AplicacionMYSQLDB(App):
                     textoLimpio = ''.join(c for c in lugarIncendio if c not in "/n")
 
                     notification.notify(
-                        title='Se ha registrado un incendio!',
-                        message=f'Ubicacion incendio: {textoLimpio}',
+                        title='Fire Detected!',
+                        message=f'Ubication of fire: {textoLimpio}',
                         app_name='FIRE ALARM',
                         app_icon='logo.jpg',
                     )
+                    sonido = SoundLoader.load('alarma.wav')
+                    sonido.play()
                     vibrator.vibrate(time=5)
                     self.notificacionActivada = True
 
